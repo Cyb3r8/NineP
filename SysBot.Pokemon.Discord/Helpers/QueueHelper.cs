@@ -138,8 +138,8 @@ public static class QueueHelper<T> where T : PKM, new()
                 .WithFooter(footerText)
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName(embedData.AuthorName)
-                    .WithIconUrl(trader.GetAvatarUrl() ?? trader.GetDefaultAvatarUrl())
-                    .WithUrl("https://genpkm.com"));
+                    .WithIconUrl(trader.GetAvatarUrl() ?? trader.GetDefaultAvatarUrl()));
+         //         .WithUrl("https://genpkm.com"));
 
             DetailsExtractor<T>.AddAdditionalText(embedBuilder);
 

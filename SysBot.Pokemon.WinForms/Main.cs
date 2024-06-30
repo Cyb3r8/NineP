@@ -178,7 +178,7 @@ public sealed partial class Main : Form
                 break;
 
             default:
-                ApplyGengarTheme();
+                ApplyLightTheme();
                 break;
         }
 
@@ -473,7 +473,7 @@ public sealed partial class Main : Form
                     break;
 
                 default:
-                    ApplyGengarTheme();
+                    ApplyLightTheme();
                     break;
             }
         }

@@ -75,7 +75,7 @@ public class TradeSettings : IBotStateSettings, ICountSettings
         public int TradeWaitTime { get; set; } = 30;
 
         [Category(TradeConfig), Description("Max amount of time in seconds pressing A to wait for a trade to process."), DisplayName("Maximum Trade Confirmation Time (seconds)")]
-        public int MaxTradeConfirmTime { get; set; } = 25;
+        public int MaxTradeConfirmTime { get; set; } = 30;
 
         [Category(TradeConfig), Description("Select default species for \"ItemTrade\", if configured."), DisplayName("Default Species for Item Trades")]
         public Species ItemTradeSpecies { get; set; } = Species.None;
@@ -432,7 +432,7 @@ public class TradeSettings : IBotStateSettings, ICountSettings
     [Category(Miscellaneous)]
     [Description("Turns off the Switch's screen during trades")]
     [DisplayName("Screen Off")]
-    public bool ScreenOff { get; set; } = false;
+    public bool ScreenOff { get; set; } = true;
 
     /// <summary>
     /// Gets a random trade code based on the range settings.
