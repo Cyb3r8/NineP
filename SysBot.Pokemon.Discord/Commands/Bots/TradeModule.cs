@@ -475,6 +475,8 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
                     }
                     pk = correctedPk;
                 }
+                // Set correct MetDate for Mightiest Mark
+                TradeExtensions<T>.CheckAndSetUnrivaledDate(pk);
                 if (pk.WasEgg)
                     pk.EggMetDate = pk.MetDate;
                 pk.ResetPartyStats();
@@ -686,7 +688,8 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
                     }
                     pk = correctedPk;
                 }
-
+                // Set correct MetDate for Mightiest Mark
+                TradeExtensions<T>.CheckAndSetUnrivaledDate(pk);
                 if (pk.WasEgg)
                     pk.EggMetDate = pk.MetDate;
                 pk.ResetPartyStats();
@@ -720,7 +723,7 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
     [Summary("Ignore AutoOT")] bool ignoreAutoOT = false)
     {
         var sig = Context.User.GetFavor();
-        return TradeAsyncAttach(code, sig, Context.User, ignoreAutoOT: ignoreAutoOT);
+        return TradeAsyncAttachInternal(code, sig, Context.User, ignoreAutoOT: ignoreAutoOT);
     }
 
     [Command("trade")]
@@ -732,7 +735,10 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
         var userID = Context.User.Id;
         var code = Info.GetRandomTradeCode(userID);
         var sig = Context.User.GetFavor();
-        await TradeAsyncAttach(code, sig, Context.User, ignoreAutoOT: ignoreAutoOT);
+        await Task.Run(async () =>
+        {
+            await TradeAsyncAttachInternal(code, sig, Context.User, ignoreAutoOT).ConfigureAwait(false);
+        }).ConfigureAwait(false);
         if (Context.Message is IUserMessage userMessage)
         {
             _ = DeleteMessagesAfterDelayAsync(userMessage, null, 2);
@@ -891,7 +897,8 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
                     await ReplyAsync($"The {spec} in the provided file is not legal.").ConfigureAwait(false);
                     return;
                 }
-
+                // Set correct MetDate for Mightiest Mark
+                TradeExtensions<T>.CheckAndSetUnrivaledDate(pk);
                 pk.ResetPartyStats();
 
                 var userID = Context.User.Id;
@@ -1040,9 +1047,11 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
                         }
                     }
                 }
+                // Set correct MetDate for Mightiest Mark
+                TradeExtensions<T>.CheckAndSetUnrivaledDate(pkm);
                 if (pkm.WasEgg)
                     pkm.EggMetDate = pkm.MetDate;
-                pk.ResetPartyStats();
+                pkm.ResetPartyStats();
 
                 var userID = Context.User.Id;
                 var code = Info.GetRandomTradeCode(userID);
@@ -1420,7 +1429,10 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
 
         var usr = Context.Message.MentionedUsers.ElementAt(0);
         var sig = usr.GetFavor();
-        await TradeAsyncAttach(code, sig, usr).ConfigureAwait(false);
+        await Task.Run(async () =>
+        {
+            await TradeAsyncAttachInternal(code, sig, usr).ConfigureAwait(false);
+        }).ConfigureAwait(false);
     }
 
     [Command("tradeUser")]
@@ -1434,7 +1446,7 @@ public class TradeModule<T> : ModuleBase<SocketCommandContext> where T : PKM, ne
         return TradeAsyncAttachUser(code, _);
     }
 
-    private async Task TradeAsyncAttach(int code, RequestSignificance sig, SocketUser usr, bool ignoreAutoOT = false)
+    private async Task TradeAsyncAttachInternal(int code, RequestSignificance sig, SocketUser usr, bool ignoreAutoOT = false)
     {
         var attachment = Context.Message.Attachments.FirstOrDefault();
         if (attachment == default)
